@@ -47,7 +47,7 @@
               id="image-preview"
               src="./assets/images/Image.png"
               alt="Imagem"
-              class="max-w-full max-h-full object-contain"
+              class="max-w-full max-h-full object-contain w-full h-full"
             />
           </div>
           <div>
@@ -65,53 +65,80 @@
       ></div>
     </section>
 
-    <script>
-      const uploadButton = document.getElementById("upload-button");
-      const fileUploadInput = document.getElementById("file-upload");
-      const imagePreview = document.getElementById("image-preview");
-      const statusText = document.getElementById("status-text");
+<script>
+  const uploadButton = document.getElementById("upload-button");
+  const fileUploadInput = document.getElementById("file-upload");
+  const imagePreview = document.getElementById("image-preview");
+  const statusText = document.getElementById("status-text");
 
-      uploadButton.addEventListener("click", () => {
-        fileUploadInput.click();
+  uploadButton.addEventListener("click", () => {
+    fileUploadInput.click();
+  });
+
+  fileUploadInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        imagePreview.src = e.target.result;
+        statusText.textContent = "Imagem pronta para análise!";
+        statusText.classList.remove("text-green-500", "text-red-500");
+        statusText.classList.add("text-[#843E71]");
+      };
+
+      reader.readAsDataURL(file);
+    }
+  });
+
+  const analyzeButton = document.getElementById("analyze-button");
+
+  analyzeButton.addEventListener("click", async () => {
+    const file = fileUploadInput.files[0];
+
+    if (!file) {
+      statusText.textContent = "Por favor, selecione uma imagem primeiro!";
+      statusText.classList.add("text-red-500");
+      return; 
+    }
+
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    const apiUrl = "http://127.0.0.1:8000/api/upload/";
+    statusText.textContent = "Analisando... 🧐";
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
       });
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.statusText}`);
+      }
 
-      fileUploadInput.addEventListener("change", (event) => {
-        const file = event.target.files[0];
+      const data = await response.json();
 
-        if (file) {
-          const reader = new FileReader();
+      console.log("Resposta da API:", data); 
+      statusText.textContent = data.resultado; 
 
-          reader.onload = (e) => {
-            imagePreview.src = e.target.result;
-            statusText.textContent = "Imagem pronta para análise!";
-            statusText.classList.remove("text-green-500", "text-red-500");
-            statusText.classList.add("text-[#843E71]");
-          };
+      if (data.resultado.toLowerCase().includes("parabéns")) {
+        imagePreview.src = "./assets/images/success.png";
+        statusText.classList.remove("text-red-500", "text-[#843E71]");
+        statusText.classList.add("text-green-500");
+      } else {
+        imagePreview.src = "./assets/images/failure.png";
+        statusText.classList.remove("text-green-500", "text-[#843E71]");
+        statusText.classList.add("text-red-500");
+      }
 
-          reader.readAsDataURL(file);
-        }
-      });
-
-      const analyzeButton = document.getElementById("analyze-button");
-
-      analyzeButton.addEventListener("click", () => {
-        const chance = Math.random();
-
-        statusText.classList.remove("text-[#843E71]");
-
-        if (chance < 0.5) {
-          imagePreview.src = "./assets/images/success.png";
-          statusText.textContent = "Está de cinto. Parabéns!";
-          statusText.classList.remove("text-red-500");
-          statusText.classList.add("text-green-500");
-        } else {
-          imagePreview.src = "./assets/images/failure.png";
-          statusText.textContent =
-            "Está sem cinto. Infração grave: Multa de R$ 195,23 e 5 ponto na CNH.";
-          statusText.classList.remove("text-green-500");
-          statusText.classList.add("text-red-500");
-        }
-      });
-    </script>
+    } catch (error) {
+      console.error("Falha ao analisar imagem:", error);
+      statusText.textContent = "Erro ao conectar com o servidor. Tente novamente.";
+      statusText.classList.add("text-red-500");
+    }
+  });
+</script>
   </body>
 </html>
