@@ -45,7 +45,7 @@
           >
             <img
               id="image-preview"
-              src="./assets/images/Image.png"
+              src="./assets/images/upload_um.png"
               alt="Imagem"
               class="max-w-full max-h-full object-contain w-full h-full"
             />
@@ -57,6 +57,11 @@
             >
               Carregue a sua imagem!
             </h2>
+
+            <!-- Mensagem de multa (inicialmente oculta) -->
+            <p id="multa-text" class="hidden text-center text-red-600 font-medium mt-3">
+              <!-- texto será setado via JS -->
+            </p>
           </div>
         </main>
       </div>
@@ -70,6 +75,7 @@
   const fileUploadInput = document.getElementById("file-upload");
   const imagePreview = document.getElementById("image-preview");
   const statusText = document.getElementById("status-text");
+  const multaText = document.getElementById("multa-text");
 
   uploadButton.addEventListener("click", () => {
     fileUploadInput.click();
@@ -86,6 +92,8 @@
         statusText.textContent = "Imagem pronta para análise!";
         statusText.classList.remove("text-green-500", "text-red-500");
         statusText.classList.add("text-[#843E71]");
+        multaText.classList.add("hidden");
+        multaText.textContent = "";
       };
 
       reader.readAsDataURL(file);
@@ -100,14 +108,27 @@
     if (!file) {
       statusText.textContent = "Por favor, selecione uma imagem primeiro!";
       statusText.classList.add("text-red-500");
+      multaText.classList.add("hidden");
+      multaText.textContent = "";
       return; 
     }
 
     const formData = new FormData();
     formData.append("imagem", file);
 
-    const apiUrl = "https://cintomante-6fed52195539.herokuapp.com/api/upload/";
+    /*const apiUrl = "https://cintomante-6fed52195539.herokuapp.com/api/upload/";
     statusText.textContent = "Analisando... 🧐";
+    multaText.classList.add("hidden");
+    multaText.textContent = "";*/
+
+    const apiUrl =
+      window.location.hostname === "localhost"
+    ? "http://localhost:8000/api/upload/"  // Backend local
+    : "https://cintomante-6fed52195539.herokuapp.com/api/upload/"; // Backend de produção
+;
+    statusText.textContent = "Analisando... 🧐";
+    multaText.classList.add("hidden");
+    multaText.textContent = "";
 
     try {
       const response = await fetch(apiUrl, {
@@ -124,19 +145,26 @@
       statusText.textContent = data.resultado; 
 
       if (data.resultado.toLowerCase().includes("parabéns")) {
-        imagePreview.src = "./assets/images/success.png";
+        imagePreview.src = "./assets/images/success_ok.jpg";
         statusText.classList.remove("text-red-500", "text-[#843E71]");
         statusText.classList.add("text-green-500");
+        multaText.classList.add("hidden");
+        multaText.textContent = "";
       } else {
-        imagePreview.src = "./assets/images/failure.png";
+        imagePreview.src = "./assets/images/fail.jpg";
         statusText.classList.remove("text-green-500", "text-[#843E71]");
         statusText.classList.add("text-red-500");
+
+        multaText.textContent = "Multa: foi detectada ausência de cinto de segurança. Valor estimado: R$ 195,23. Regularize a situação o mais rápido possível.";
+        multaText.classList.remove("hidden");
       }
 
     } catch (error) {
       console.error("Falha ao analisar imagem:", error);
       statusText.textContent = "Erro ao conectar com o servidor. Tente novamente.";
       statusText.classList.add("text-red-500");
+      multaText.classList.add("hidden");
+      multaText.textContent = "";
     }
   });
 </script>
