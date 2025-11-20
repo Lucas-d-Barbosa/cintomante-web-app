@@ -9,7 +9,11 @@
     <section class="w-full h-full flex">
       <div class="w-[95%] h-full flex flex-col">
         <header class="w-full h-auto p-2 gap-2">
-          <img src="./assets/images/logo.png" alt="Logo da cintomante" />
+          <img
+            src="./assets/images/logo.png"
+            alt="Logo da cintomante"
+            onerror="this.style.display='none'"
+          />
         </header>
         <main
           class="w-full h-4/5 flex justify-center items-center flex-col gap-4"
@@ -41,13 +45,13 @@
             </div>
           </form>
           <div
-            class="w-[90%] md:w-[50%] h-3/5 bg-[#D9D9D9] p-2 flex justify-center items-center"
+            class="w-[90%] md:w-[50%] h-3/5 bg-[#D9D9D9] p-4 flex justify-center items-center rounded-lg"
           >
             <img
               id="image-preview"
-              src="./assets/images/upload_um.png"
-              alt="Imagem"
-              class="max-w-full max-h-full object-contain w-full h-full"
+              src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%239ca3af' class='w-6 h-6'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z' /></svg>"
+              alt="Preview da Imagem"
+              class="max-w-full max-h-full object-contain w-full h-full rounded-lg"
             />
           </div>
           <div>
@@ -58,8 +62,10 @@
               Carregue a sua imagem!
             </h2>
 
-            <p id="multa-text" class="hidden text-center text-red-600 font-medium mt-3">
-            </p>
+            <p
+              id="multa-text"
+              class="hidden text-center text-red-600 font-medium mt-3 w-[90%] md:w-[60%] mx-auto"
+            ></p>
           </div>
         </main>
       </div>
@@ -68,97 +74,100 @@
       ></div>
     </section>
 
-<script>
-  const uploadButton = document.getElementById("upload-button");
-  const fileUploadInput = document.getElementById("file-upload");
-  const imagePreview = document.getElementById("image-preview");
-  const statusText = document.getElementById("status-text");
-  const multaText = document.getElementById("multa-text");
+    <script>
+      const svgSuccess =
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2322c55e'><path fill-rule='evenodd' d='M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z' clip-rule='evenodd'/></svg>";
+      const svgFail =
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'><path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z' clip-rule='evenodd'/></svg>";
 
-  uploadButton.addEventListener("click", () => {
-    fileUploadInput.click();
-  });
+      const uploadButton = document.getElementById("upload-button");
+      const fileUploadInput = document.getElementById("file-upload");
+      const imagePreview = document.getElementById("image-preview");
+      const statusText = document.getElementById("status-text");
+      const multaText = document.getElementById("multa-text");
 
-  fileUploadInput.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        imagePreview.src = e.target.result;
-        statusText.textContent = "Imagem pronta para análise!";
-        statusText.classList.remove("text-green-500", "text-red-500");
-        statusText.classList.add("text-[#843E71]");
-        multaText.classList.add("hidden");
-        multaText.textContent = "";
-      };
-
-      reader.readAsDataURL(file);
-    }
-  });
-
-  const analyzeButton = document.getElementById("analyze-button");
-
-  analyzeButton.addEventListener("click", async () => {
-    const file = fileUploadInput.files[0];
-
-    if (!file) {
-      statusText.textContent = "Por favor, selecione uma imagem primeiro!";
-      statusText.classList.add("text-red-500");
-      multaText.classList.add("hidden");
-      multaText.textContent = "";
-      return; 
-    }
-
-    const formData = new FormData();
-    formData.append("imagem", file);
-
-    const apiUrl = "https://back-cintomante-e9e5202bdfd0.herokuapp.com/api";
-    
-    statusText.textContent = "Analisando... 🧐";
-    multaText.classList.add("hidden");
-    multaText.textContent = "";
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        body: formData,
+      uploadButton.addEventListener("click", () => {
+        fileUploadInput.click();
       });
-      
-      if (!response.ok) {
-        throw new Error(`Erro na API: ${response.statusText}`);
-      }
 
-      const data = await response.json();
-      const predicao = data.predicao ? data.predicao.toLowerCase() : "indefinido";
-      
-      if (predicao === "sem cinto") {
-        statusText.textContent = "Resultado: Sem cinto";
-        imagePreview.src = "./assets/images/fail.jpg";
-        statusText.classList.remove("text-green-500", "text-[#843E71]");
-        statusText.classList.add("text-red-500");
+      fileUploadInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
 
-        multaText.textContent = "Multa: foi detectada ausência de cinto de segurança. Valor estimado: R$ 195,23. Regularize a situação o mais rápido possível.";
-        multaText.classList.remove("hidden");
-        
-      } else {
-        statusText.textContent = "Parabéns! Uso de cinto detectado.";
-        imagePreview.src = "./assets/images/success_ok.jpg";
-        statusText.classList.remove("text-red-500", "text-[#843E71]");
-        statusText.classList.add("text-green-500");
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            statusText.textContent = "Imagem pronta para análise!";
+            statusText.classList.remove("text-green-500", "text-red-500");
+            statusText.classList.add("text-[#843E71]");
+            multaText.classList.add("hidden");
+            multaText.textContent = "";
+          };
+
+          reader.readAsDataURL(file);
+        }
+      });
+
+      const analyzeButton = document.getElementById("analyze-button");
+
+      analyzeButton.addEventListener("click", async () => {
+        const file = fileUploadInput.files[0];
+
+        if (!file) {
+          statusText.textContent = "Por favor, selecione uma imagem primeiro!";
+          statusText.classList.add("text-red-500");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("imagem", file);
+
+        const apiUrl = "https://back-cintomante-e9e5202bdfd0.herokuapp.com/api";
+
+        statusText.textContent = "Analisando... 🧐";
         multaText.classList.add("hidden");
-        multaText.textContent = "";
-      }
 
-    } catch (error) {
-      console.error(error);
-      statusText.textContent = "Erro ao conectar com o servidor. Tente novamente.";
-      statusText.classList.add("text-red-500");
-      multaText.classList.add("hidden");
-      multaText.textContent = "";
-    }
-  });
-</script>
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`Erro na API: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          const predicao = data.predicao
+            ? data.predicao.toLowerCase()
+            : "indefinido";
+
+          if (predicao === "sem cinto") {
+            statusText.textContent = "Resultado: Sem cinto";
+            imagePreview.src = svgFail;
+
+            statusText.classList.remove("text-green-500", "text-[#843E71]");
+            statusText.classList.add("text-red-500");
+
+            multaText.textContent =
+              "Multa: foi detectada ausência de cinto de segurança. Valor estimado: R$ 195,23. Regularize a situação o mais rápido possível.";
+            multaText.classList.remove("hidden");
+          } else {
+            statusText.textContent = "Parabéns! Uso de cinto detectado.";
+            imagePreview.src = svgSuccess;
+
+            statusText.classList.remove("text-red-500", "text-[#843E71]");
+            statusText.classList.add("text-green-500");
+            multaText.classList.add("hidden");
+          }
+        } catch (error) {
+          console.error(error);
+          statusText.textContent = "Erro ao conectar com o servidor.";
+          statusText.classList.add("text-red-500");
+          multaText.classList.add("hidden");
+        }
+      });
+    </script>
   </body>
 </html>
