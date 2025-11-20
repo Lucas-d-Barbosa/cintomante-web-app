@@ -58,9 +58,7 @@
               Carregue a sua imagem!
             </h2>
 
-            <!-- Mensagem de multa (inicialmente oculta) -->
             <p id="multa-text" class="hidden text-center text-red-600 font-medium mt-3">
-              <!-- texto será setado via JS -->
             </p>
           </div>
         </main>
@@ -117,50 +115,44 @@
     formData.append("imagem", file);
 
     const apiUrl = "https://back-cintomante-e9e5202bdfd0.herokuapp.com/api";
+    
     statusText.textContent = "Analisando... 🧐";
     multaText.classList.add("hidden");
     multaText.textContent = "";
-
-    /*const apiUrl =
-      window.location.hostname === "localhost"
-    ? "http://localhost:8000/api/upload/"
-    : "https://cintomante-6fed52195539.herokuapp.com/api/upload/"; 
-;
-    statusText.textContent = "Analisando... 🧐";
-    multaText.classList.add("hidden");
-    multaText.textContent = "";*/
 
     try {
       const response = await fetch(apiUrl, {
         method: "POST",
         body: formData,
       });
+      
       if (!response.ok) {
         throw new Error(`Erro na API: ${response.statusText}`);
       }
 
       const data = await response.json();
-
-      console.log("Resposta da API:", data); 
-      statusText.textContent = data.resultado; 
-
-      if (data.resultado.toLowerCase().includes("parabéns")) {
-        imagePreview.src = "./assets/images/success_ok.jpg";
-        statusText.classList.remove("text-red-500", "text-[#843E71]");
-        statusText.classList.add("text-green-500");
-        multaText.classList.add("hidden");
-        multaText.textContent = "";
-      } else {
+      const predicao = data.predicao ? data.predicao.toLowerCase() : "indefinido";
+      
+      if (predicao === "sem cinto") {
+        statusText.textContent = "Resultado: Sem cinto";
         imagePreview.src = "./assets/images/fail.jpg";
         statusText.classList.remove("text-green-500", "text-[#843E71]");
         statusText.classList.add("text-red-500");
 
         multaText.textContent = "Multa: foi detectada ausência de cinto de segurança. Valor estimado: R$ 195,23. Regularize a situação o mais rápido possível.";
         multaText.classList.remove("hidden");
+        
+      } else {
+        statusText.textContent = "Parabéns! Uso de cinto detectado.";
+        imagePreview.src = "./assets/images/success_ok.jpg";
+        statusText.classList.remove("text-red-500", "text-[#843E71]");
+        statusText.classList.add("text-green-500");
+        multaText.classList.add("hidden");
+        multaText.textContent = "";
       }
 
     } catch (error) {
-      console.error("Falha ao analisar imagem:", error);
+      console.error(error);
       statusText.textContent = "Erro ao conectar com o servidor. Tente novamente.";
       statusText.classList.add("text-red-500");
       multaText.classList.add("hidden");
