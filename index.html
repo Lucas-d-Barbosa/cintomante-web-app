@@ -116,19 +116,19 @@
     const formData = new FormData();
     formData.append("imagem", file);
 
-    /*const apiUrl = "https://cintomante-6fed52195539.herokuapp.com/api/upload/";
-    statusText.textContent = "Analisando... 🧐";
-    multaText.classList.add("hidden");
-    multaText.textContent = "";*/
-
-    const apiUrl =
-      window.location.hostname === "localhost"
-    ? "http://localhost:8000/api/upload/"  // Backend local
-    : "https://cintomante-6fed52195539.herokuapp.com/api/upload/"; // Backend de produção
-;
+    const apiUrl = "https://back-cintomante-e9e5202bdfd0.herokuapp.com/api";
     statusText.textContent = "Analisando... 🧐";
     multaText.classList.add("hidden");
     multaText.textContent = "";
+
+    /*const apiUrl =
+      window.location.hostname === "localhost"
+    ? "http://localhost:8000/api/upload/"
+    : "https://cintomante-6fed52195539.herokuapp.com/api/upload/"; 
+;
+    statusText.textContent = "Analisando... 🧐";
+    multaText.classList.add("hidden");
+    multaText.textContent = "";*/
 
     try {
       const response = await fetch(apiUrl, {
